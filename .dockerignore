@@ -1,0 +1,8 @@
+.git
+__pycache__
+*.py[cod]
+.env
+.env.*
+.mypy_cache
+.pytest_cache
+uv.lock
