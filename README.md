@@ -1,88 +1,122 @@
-# MCP Demo
+<div align="center">
+  <img src="cursor-denver.png" alt="Cursor Denver" width="400"/>
+  
+  # MCP Demo
+  
+  [![Python 3.12+](https://img.shields.io/badge/python-3.12+-blue.svg)](https://www.python.org/downloads/)
+  [![FastMCP](https://img.shields.io/badge/FastMCP-powered-purple.svg)](https://github.com/jlowin/fastmcp)
+  [![Docker](https://img.shields.io/badge/docker-ready-2496ED.svg?logo=docker&logoColor=white)](https://www.docker.com/)
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+  
+  **A production-ready FastMCP reference server with hackathon resources and reusable starter prompts**
+  
+</div>
 
-A FastMCP reference server that ships with a hackathon overview resource and a reusable starter prompt. Clone the repo, install the dependencies (or build the Docker image), and you have an MCP server that Cursor can load immediately.
+---
+
+## Overview
+
+A FastMCP server with comprehensive hackathon overview resources and reusable starter prompts. Clone, install dependencies or build the Docker image, and you have an MCP server that Cursor can load immediately.
 
 ## Requirements
-- Python 3.12+
-- `pip` (ships with Python)
-- Docker 24+ (optional, for containerised usage)
+
+| Component | Version | Required |
+|-----------|---------|----------|
+| Python | 3.12+ | Yes |
+| uv | Latest | Yes |
+| Docker | 24+ | Optional |
+| Node.js | 18+ | Optional |
+
+---
+
+## Quick Start
+
+### Local Python Setup
+
+```bash
+# Install dependencies and run
+uv sync
+uv run server.py
+```
+
+### Docker Setup
+
+```bash
+# Build the image
+docker build -t mcp-demo:latest .
+
+# Run the container
+docker run --rm -i mcp-demo:latest
+
+# Development mode with live reload
+docker run --rm -it -v "$(pwd)":/app mcp-demo:latest
+```
+
+### Remote MCP (no local setup)
+
+```bash
+npx -y mcp-remote https://cursor-denver-mcp-hackathon.fastmcp.app/mcp
+```
+
+---
 
 ## Deployment Options
 
-This server can run in two modes:
-1. **Local STDIO** (for Cursor integration) - see setup below
-2. **Remote HTTP/SSE** (for public access, ChatGPT, etc.) - see [DEPLOY.md](DEPLOY.md)
+| Mode | Use Case | Setup | Best For |
+|------|----------|-------|----------|
+| Local STDIO | Cursor integration | Simple | Development |
+| Remote HTTP/SSE | Public access | Advanced | Production |
+| Docker Local | Isolated environment | Medium | Testing |
+| Docker Remote | Cloud deployment | Advanced | Production |
 
-## Local Setup
-1. Create and activate a virtual environment (recommended):
-   ```bash
-   python -m venv .venv
-   source .venv/bin/activate
-   ```
-2. Install dependencies:
-   ```bash
-   pip install --upgrade pip
-   pip install -r requirements.txt
-   ```
-3. Run the FastMCP server (it listens on STDIN/STDOUT as required by the MCP spec):
-   ```bash
-   python server.py
-   ```
+### Container Registry Push
 
-## Docker Setup
-1. Build the image (the Dockerfile installs into an isolated virtual environment and runs as a non-root user):
-   ```bash
-   docker build -t mcp-demo:latest .
-   ```
-2. Run the container, keeping STDIN open so MCP clients can communicate with it:
-   ```bash
-   docker run --rm -i mcp-demo:latest
-   ```
-   Add `-t` if you want an interactive TTY while debugging.
-3. Mount your working directory if you want to live-edit the code without rebuilding:
-   ```bash
-   docker run --rm -it -v "$(pwd)":/app mcp-demo:latest
-   ```
-   The container's default command is `python server.py`, so it behaves exactly like the local workflow.
+```bash
+# GitHub Container Registry
+docker tag mcp-demo:latest ghcr.io/<your-user>/mcp-demo:latest
+docker push ghcr.io/<your-user>/mcp-demo:latest
 
-## Deploying the Container
-The image is ready to drop into any container platform (AWS ECS/Fargate, AWS App Runner, Railway, Fly.io, etc.). A typical deployment looks like:
+# Docker Hub
+docker tag mcp-demo:latest <your-user>/mcp-demo:latest
+docker push <your-user>/mcp-demo:latest
+```
 
-1. Tag the image for your registry and push it:
-   ```bash
-   docker tag mcp-demo:latest ghcr.io/<your-user>/mcp-demo:latest
-   docker push ghcr.io/<your-user>/mcp-demo:latest
-   ```
-   Replace the registry URL with ECR, Docker Hub, or your preferred destination.
-2. Create a service that runs the container with the default command `python server.py`. MCP servers communicate over STDIN/STDOUT, so no ports need to be exposed unless you run a proxy alongside it.
-3. (Optional) If your platform expects an HTTP interface, pair the container with an MCP bridge/relay that converts HTTP/WebSocket traffic to the STDIO protocol.
+---
 
 ## Cursor Configuration
-Add the MCP server to `.cursor/config.json` using either a local Python interpreter or the Docker image.
 
-**Local Python:**
+Add to `~/.cursor/mcp.json`:
+
+<table>
+<tr>
+<th>Local (uv)</th>
+<th>Docker Container</th>
+</tr>
+<tr>
+<td>
+
 ```json
 {
   "mcpServers": {
     "fastmcp-demo": {
-      "command": "python",
-      "args": ["server.py"],
+      "command": "uv",
+      "args": ["run", "server.py"],
       "cwd": "/absolute/path/to/mcp-demo"
     }
   }
 }
 ```
 
-**Docker container:**
+</td>
+<td>
+
 ```json
 {
   "mcpServers": {
     "fastmcp-demo": {
       "command": "docker",
       "args": [
-        "run",
-        "--rm",
-        "-i",
+        "run", "--rm", "-i",
         "--volume",
         "/absolute/path/to/mcp-demo:/app",
         "mcp-demo"
@@ -91,19 +125,75 @@ Add the MCP server to `.cursor/config.json` using either a local Python interpre
   }
 }
 ```
-Mounting the repository lets you iterate on `server.py` without rebuilding the image. Omit the `--volume` flag if you prefer a read-only container.
 
-Restart Cursor after updating the configuration so it can spawn the server.
+</td>
+</tr>
+</table>
 
-## Tests
-Run the test suite to ensure everything is wired correctly:
-```bash
-pytest
+### Remote MCP Server
+
+```json
+{
+  "mcpServers": {
+    "denver-hackathon": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://cursor-denver-mcp-hackathon.fastmcp.app/mcp"
+      ]
+    }
+  }
+}
 ```
 
-## Project Structure
-- `server.py` – FastMCP server exposing the hackathon overview resource and starter prompt
-- `tests/` – Pytest suite that validates resources and prompt wiring
-- `Dockerfile` / `.dockerignore` – Container build assets for running the server in Docker
+Restart Cursor after updating configuration.
 
-Happy hacking!
+---
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=. --cov-report=html
+
+# Run specific test
+pytest tests/test_server.py -v
+```
+
+---
+
+## Project Structure
+
+```
+mcp-demo/
+├── server.py                 # FastMCP server
+├── main.py                   # Alternative entry point
+├── Dockerfile                # Container build
+├── requirements.txt          # Dependencies
+├── pyproject.toml            # Project config
+├── resources/
+│   └── hackathon_overview.md
+├── prompts/
+│   └── fastmcp_python_starter.md
+└── tests/
+    ├── conftest.py
+    └── test_server.py
+```
+
+---
+
+## License
+
+MIT License
+
+---
+
+<div align="center">
+  
+Built for the Cursor Denver Hackathon
+
+</div>
