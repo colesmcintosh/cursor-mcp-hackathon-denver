@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="cursor-denver.png" alt="Cursor Denver" width="400"/>
+  <img src="assets/cursor-denver.png" alt="Cursor Denver" width="400"/>
   
   # MCP Demo
   
