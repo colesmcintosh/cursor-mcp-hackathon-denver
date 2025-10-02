@@ -1,8 +1,38 @@
-.git
-__pycache__
+# Python
+__pycache__/
 *.py[cod]
-.env
-.env.*
-.mypy_cache
-.pytest_cache
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursor/
+
+# Git
+.git/
+.gitignore
+
+# Tests
+tests/__pycache__/
+.pytest_cache/
+htmlcov/
+.coverage
+
+# Documentation
+*.md
+!README.md
+
+# Misc
+.DS_Store
+*.log
 uv.lock

@@ -50,5 +50,18 @@ def fastmcp_python_prompt() -> list[PromptMessage]:
     ]
 
 
+@app.tool()
+def get_hackathon_info(query: str) -> str:
+    """Get the hackathon overview.
+    
+    Args:
+        query: The search term or topic to find in the hackathon overview
+        
+    Returns:
+        The hackathon overview
+    """
+    return HACKATHON_MARKDOWN
+
+
 if __name__ == "__main__":
     app.run()
