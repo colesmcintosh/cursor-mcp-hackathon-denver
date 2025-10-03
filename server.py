@@ -1,46 +1,27 @@
-"""FastMCP server providing hackathon resources and starter prompts."""
+"""FastMCP server providing hackathon resources."""
 
 from pathlib import Path
-
 from fastmcp import FastMCP
-from fastmcp.prompts import Message
-from mcp.types import PromptMessage
 
-APP_NAME = "fastmcp-hackathon"
-APP_DESCRIPTION = (
-    "Provides the hackathon overview markdown and a starter prompt for building "
-    "FastMCP servers with Python."
-)
+APP_NAME = "denver-hackathon"
+APP_DESCRIPTION = "Provides the MCP Server Hackathon overview and information."
 
 app = FastMCP(name=APP_NAME, instructions=APP_DESCRIPTION)
 
 BASE_DIR = Path(__file__).parent
 HACKATHON_MARKDOWN_PATH = BASE_DIR / "resources" / "hackathon_overview.md"
-PROMPT_TEMPLATE_PATH = BASE_DIR / "prompts" / "fastmcp_python_starter.md"
 
 HACKATHON_MARKDOWN = HACKATHON_MARKDOWN_PATH.read_text(encoding="utf-8")
-PROMPT_TEMPLATE = PROMPT_TEMPLATE_PATH.read_text(encoding="utf-8")
 
 @app.tool()
-def get_hackathon_info(query: str) -> str:
-    """Get the hackathon overview.
+def get_hackathon_info() -> str:
+    """Get the complete hackathon overview with all information about the MCP Server Hackathon.
     
-    Args:
-        query: The search term or topic to find in the hackathon overview
-        
     Returns:
-        The hackathon overview
+        The full hackathon overview document including format, getting started guide, 
+        project ideas, resources, and quick reference.
     """
     return HACKATHON_MARKDOWN
-
-@app.tool()
-def expert_fastmcp_builder(query: str) -> str:
-    """Get the prompt template.
-    
-    Args:
-        query: The search term or topic to find in the prompt template
-    """
-    return PROMPT_TEMPLATE
 
 
 if __name__ == "__main__":
